@@ -12,7 +12,7 @@
   <img src="https://img.shields.io/github/stars/dev-tecksolke/tecksolke-tpay-app-api.svg">
   </a>
   <br><br>
-  <img src="http://s.4cdn.org/image/title/105.gif">
+  <img src="https://tpay.co.ke/img/tpay-api.gif">
 </p>
 
 T-Pay API is REST-API that makes it easy for one to make request to the T-Pay Payment Gateway for his/her App.
@@ -29,7 +29,7 @@ T-Pay API is REST-API that makes it easy for one to make request to the T-Pay Pa
 
 ## Installing
 
-The recommended way to install tpay-api is through
+The recommended way to install tpay-app-api is through
 [Composer](http://getcomposer.org).
 
 ```bash
@@ -37,7 +37,7 @@ The recommended way to install tpay-api is through
 composer require tecksolke-tpay/app-api
 ```
 
-Next, run the Composer command to install the latest stable version of *tpay/api*:
+Next, run the Composer command to install the latest stable version of *tpay/app-api*:
 
 ```bash
 # Update package via composer
@@ -61,7 +61,7 @@ php artisan vendor:publish --provider="TPay\API\TPayServiceProvider"
 You will have to provide this in the *.env* for the api configurations:
 
 ```php
-# https://sandbox.tpay.co.ke/api/t-pay/v1/oauth2/
+# https://sandbox.tpay.co.ke or https://production.tpay.co.ke
 T_PAY_END_POINT_URL=
 
 # TP4*****82F <-- keep this key secret -->
@@ -91,7 +91,7 @@ This how the api will be accessed via this package...
 ```php
      /**
         * ---------------------------------
-        *  Test for requesting app balance
+        *  Requesting app balance [ GET Request  ]
         * ---------------------------------
         * @throws \Exception
         */
@@ -110,10 +110,39 @@ This how the api will be accessed via this package...
                //TODO If an exception occurs
            }
        }
+       
+       
+
+        /**
+         * ------------------
+         * Express Payment [ POST Request ]
+         * -----------------
+         * This is used to directly get payment from
+         * a client account to your application
+         */
+        public function expressPayment() {
+            try {
+                $options = [
+                    'referenceCode' => '',//Unique referenceCode i.e TPXXXXX
+                    'redirectURL' => '',//This is the URL that the user will be redirect after payment
+                    'resultURL' => '',//This is the url that will receive the response data after successful payment. Note that this has to be a post callback so remember to use post in your callback.
+                    'amount' => 1,//amount to be paid 
+                ];
+    
+                //make the request here
+                $response = ExpressPayment::expressPayment($options);
+    
+                //proceed with the response
+    
+            } catch (Exception $exception) {
+                //TODO If an exception occurs
+            }
+        }
+
    
        /**
         * ------------------------------------
-        * Making app stk push request for c2b
+        * Making app stk push request for c2b  [ POST Request ]
         * ------------------------------------
         */
        public function appC2BSTKPush() {
@@ -124,7 +153,7 @@ This how the api will be accessed via this package...
                    'phoneNumber' => '',//The phone number has to be 2547xxxxxxx
                    'referenceCode' => '',//The secret code should be unique in every request you send and must start with TPXXXX
                    'amount' => 1,//Amount has to be an integer and less than or equal to KES 70000
-                   'resultURL' => '',//This has to be your callback i.e https://mydomain/callback or http://mydomain/callback
+                   'resultURL' => '',//This has to be your callback i.e https://mydomain/callback or http://mydomain/callback. Also note that this has to be a post callback so remember to use post in your callback.
                ];
    
                //make the c2b stk push here
@@ -138,7 +167,7 @@ This how the api will be accessed via this package...
    
        /**
         * ------------------------------------
-        * Making app withdraw request for b2c
+        * Making app withdraw request for b2c  [ POST Request ]
         * ------------------------------------
         */
        public function appB2C() {
@@ -149,7 +178,7 @@ This how the api will be accessed via this package...
                    'phoneNumber' => '',//The phone number has to be 2547xxxxxxx
                    'referenceCode' => '',//The secret code should be unique in every request you send and must start with TPXXXX
                    'amount' => 1,//Amount has to be an integer and has to be greater than KES 10
-                   'resultURL' => '',//This has to be your callback i.e https://mydomain/callback or http://mydomain/callback
+                   'resultURL' => '',//This has to be your callback i.e https://mydomain/callback or http://mydomain/callback. Also note that this has to be a post callback so remember to use post in your callback.
                ];
    
                //make the b2c withdraw here
@@ -164,11 +193,79 @@ This how the api will be accessed via this package...
     
 ```
 
+#### API Response(s)
+This is for Express Payment success -- The express payment callback will only be sent if the client pays --
+
+```php
+{
+    "success":true,
+    "data":{
+    "amount":1,//This will be the amount paid to your application
+    "referenceCode":"TP0******6F7"//This the reference code you used to make your request
+    }
+}
+```
+
+This is for B2C success -- The withdraw has been received --
+
+```php
+{
+    "success":true,
+    "data":{
+        "appName":"",//Your App Name
+        "referenceCode":"",//This will be your reference Code that you used to make the request
+        "receiver":"",//The number that receives the payment
+        "transactionID":"",//Unique transaction ID
+        "amount"://The amount withdrawn
+         }
+}
+```
+
+This is for B2C failed -- The withdraw has not been received --
+
+```php
+{
+    "success":false,
+    "data":{
+        "appName":"",//Your App Name
+        "referenceCode":"",//This will be your reference Code that you used to make the request
+         }
+}
+```
+
+This is for C2B success -- The Payment has been made --
+
+```php
+{
+    "success":true,
+    "data":{
+         "appName":"",//Your App Name
+         "referenceCode":"",//This will be your reference Code that you used to make the request
+         "phoneNumber":"",//The number that makes the payment
+         "transactionID":"",//Unique transaction ID
+         "amount"://The amount deposited/Paid
+        }
+}
+```
+
+This is for C2B failed -- The Payment has not been made --
+
+```php
+{
+    "success":false,
+    "data":{
+        "appName":"",//Your App Name
+        "referenceCode":"",//This will be your reference Code that you used to make the request
+         }
+}
+```
+
+
 ## Version Guidance
 
 | Version | Status     | Packagist           | Namespace    | Repo                |
 |---------|------------|---------------------|--------------|---------------------|
-| 1.x     | Latest     | `tecksolke-tpay/app-api` | `TPay\API` | [v1.0.0](https://github.com/dev-tecksolke/tecksolke-tpay-app-api/tree/1.0)|
+| 1.x     | Latest     | `tecksolke-tpay/app-api` | `TPay\API` | [v1.9.9](https://github.com/dev-tecksolke/tecksolke-tpay-app-api/tree/1.0)|
 
 [tpay-api-1-repo]: https://github.com/dev-tecksolke/tpay-api.git
 

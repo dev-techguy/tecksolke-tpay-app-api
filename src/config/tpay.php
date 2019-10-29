@@ -19,7 +19,7 @@ return [
      * are sent and responses given back.
      * -------------------------------------------------------------------
      */
-    'end_point_url' => env('T_PAY_END_POINT_URL', 'https://sandbox.tpay.co.ke/api/t-pay/v1/oauth2/'),//This contains the end point url
+    'end_point_url' => env('T_PAY_END_POINT_URL', 'https://sandbox.tpay.co.ke'),//This contains the end point url
 
     /**
      * ---------------------------------------------------
@@ -31,7 +31,7 @@ return [
      * it in a production environment.
      * -------------------------------------------------------------
      */
-    'app_key' => env('T_PAY_APP_KEY', 'TP43C020782F'),//This is the app key for the specific app you are authenticating
+    'app_key' => env('T_PAY_APP_KEY'),//This is the app key for the specific app you are authenticating
 
 
     /**
@@ -41,7 +41,7 @@ return [
      * The app secret code is used to identify your app during every request you make
      * The app secret code can change depending on the app environment that is  [production/sandbox]
      */
-    'app_secret_code' => env('T_PAY_APP_SECRET_CODE', 'MlIRHpEjmqAiHq63HBAlf2GDfHUsckXqLzNzEiaxIkvYiRwbPD'),
+    'app_secret_code' => env('T_PAY_APP_SECRET_CODE'),
 
     /**
      * ------------------------------
